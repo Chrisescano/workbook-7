@@ -21,11 +21,16 @@ inner join categories
 on products.CategoryID = categories.CategoryID
 order by ProductName;
 
--- query 4
-select ProductName, CategoryName from products
-inner join categories
-on products.CategoryID = categories.CategoryID
-where UnitPrice = (select max(UnitPrice) from products);
+-- query 4 : ProductName, CategoryName 
+select products.ProductName, categories.CategoryName, products.UnitPrice AS MaxUnitPrice
+from products
+inner join ( -- finds max price of each category and joins with products table
+	select CategoryID, max(UnitPrice) as MaxUnitPrice from products
+    group by CategoryID
+) as MaxPrices
+on products.CategoryID = MaxPrices.CategoryID and products.UnitPrice = MaxPrices.MaxUnitPrice
+inner join categories -- gets the category name of each products by category id
+on products.CategoryID = categories.CategoryID;
 
 -- query 5
 select OrderID, ShipName, ShipAddress, CompanyName from orders
